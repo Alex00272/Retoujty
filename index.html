@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Just for you Retouja 🌸</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Pacifico&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --pink:     #FF85A1;
+      --lilac:    #C9A7F5;
+      --peach:    #FFB5A7;
+      --mint:     #A8E6CF;
+      --sky:      #A7D7F9;
+      --yellow:   #FFE066;
+      --cream:    #FFF5F9;
+      --soft-white: #FFFBFE;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #FFF0F5 0%, #F3EAFF 50%, #EAF8FF 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ===== LOADING SCREEN ===== */
+    #loader {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: linear-gradient(160deg, #FFE4F0 0%, #F0E4FF 50%, #E4F4FF 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    #loader.hide {
+      opacity: 0;
+      transform: scale(1.04);
+      pointer-events: none;
+    }
+
+    /* big bouncing heart */
+    .loader-heart {
+      font-size: 5rem;
+      animation: heartBeat 0.9s ease-in-out infinite;
+      filter: drop-shadow(0 8px 24px rgba(255,133,161,0.5));
+    }
+    @keyframes heartBeat {
+      0%, 100% { transform: scale(1);    }
+      14%       { transform: scale(1.2);  }
+      28%       { transform: scale(1);    }
+      42%       { transform: scale(1.15); }
+      70%       { transform: scale(1);    }
+    }
+
+    .loader-title {
+      font-family: 'Pacifico', cursive;
+      font-size: clamp(1.6rem, 5vw, 2.6rem);
+      background: linear-gradient(135deg, #FF85A1, #C9A7F5);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-align: center;
+      padding: 0 20px;
+    }
+
+    .loader-sub {
+      font-size: 1rem;
+      color: #c084a0;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-align: center;
+      animation: blink 1.4s ease-in-out infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.4; }
+    }
+
+    /* progress bar */
+    .loader-bar-wrap {
+      width: min(320px, 80vw);
+      height: 12px;
+      background: rgba(255,133,161,0.18);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .loader-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #FF85A1, #C9A7F5, #A7D7F9);
+      border-radius: 99px;
+      animation: fillBar 2.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      background-size: 200% 100%;
+      animation: fillBar 2.8s ease forwards, shimmer 1.2s linear infinite;
+    }
+    @keyframes fillBar {
+      0%   { width: 0%; }
+      60%  { width: 75%; }
+      100% { width: 100%; }
+    }
+    @keyframes shimmer {
+      0%   { background-position: 200% center; }
+      100% { background-position: -200% center; }
+    }
+
+    /* floating mini emojis on loader */
+    .loader-floats {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .lf {
+      position: absolute;
+      font-size: 1.6rem;
+      opacity: 0;
+      animation: lfFloat 3s ease-in-out infinite;
+    }
+    @keyframes lfFloat {
+      0%   { opacity: 0; transform: translateY(0) scale(0.6); }
+      30%  { opacity: 0.7; }
+      70%  { opacity: 0.5; }
+      100% { opacity: 0; transform: translateY(-80px) scale(1.1); }
+    }
+    /* ===== END LOADING SCREEN ===== */
+
+    /* floating hearts background */
+    .hearts-bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .heart-float {
+      position: absolute;
+      font-size: 1.4rem;
+      opacity: 0.12;
+      animation: floatUp linear infinite;
+    }
+
+    @keyframes floatUp {
+      0%   { transform: translateY(110vh) rotate(0deg); opacity: 0.15; }
+      100% { transform: translateY(-10vh) rotate(20deg); opacity: 0; }
+    }
+
+    /* hero section */
+    .hero {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 60px 20px 40px;
+    }
+
+    .name-tag {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--pink), var(--lilac));
+      color: white;
+      font-family: 'Pacifico', cursive;
+      font-size: clamp(2.2rem, 7vw, 4.5rem);
+      padding: 18px 44px;
+      border-radius: 60px;
+      box-shadow: 0 12px 40px rgba(255, 133, 161, 0.4);
+      animation: gentlePulse 3s ease-in-out infinite;
+      letter-spacing: 2px;
+    }
+
+    @keyframes gentlePulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 12px 40px rgba(255,133,161,0.4); }
+      50%       { transform: scale(1.03); box-shadow: 0 18px 55px rgba(201,167,245,0.5); }
+    }
+
+    .hero-subtitle {
+      margin-top: 22px;
+      font-size: clamp(1rem, 3vw, 1.3rem);
+      color: #c084a0;
+      font-weight: 600;
+    }
+
+    /* hello kitty stickers row */
+    .kitty-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      padding: 20px 20px 0;
+      position: relative;
+      z-index: 1;
+    }
+    .kitty-sticker {
+      width: 110px;
+      height: 110px;
+      object-fit: contain;
+      animation: wobble 3.5s ease-in-out infinite;
+      filter: drop-shadow(0 6px 16px rgba(255,133,161,0.3));
+      border-radius: 20px;
+    }
+    .kitty-sticker:nth-child(2) { animation-delay: 0.5s; }
+    .kitty-sticker:nth-child(3) { animation-delay: 1s; }
+    .kitty-sticker:nth-child(4) { animation-delay: 1.5s; }
+
+    @keyframes wobble {
+      0%, 100% { transform: rotate(-3deg) scale(1); }
+      50%       { transform: rotate(3deg) scale(1.07); }
+    }
+
+    /* main content wrapper */
+    .content {
+      position: relative;
+      z-index: 1;
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 30px 20px 80px;
+    }
+
+    /* cards */
+    .card {
+      background: rgba(255,255,255,0.75);
+      backdrop-filter: blur(14px);
+      border-radius: 28px;
+      padding: 36px 40px;
+      margin-bottom: 30px;
+      box-shadow: 0 8px 32px rgba(201,167,245,0.18);
+      border: 2px solid rgba(255,255,255,0.6);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 50px rgba(201,167,245,0.28);
+    }
+
+    .card-title {
+      font-family: 'Pacifico', cursive;
+      font-size: 1.55rem;
+      margin-bottom: 18px;
+    }
+
+    /* big love message */
+    .love-card {
+      background: linear-gradient(135deg, #fff0f6, #f3eaff);
+      border: 2px solid rgba(255,133,161,0.3);
+      text-align: center;
+    }
+    .love-card .card-title { color: var(--pink); }
+    .love-text {
+      font-size: 1.15rem;
+      line-height: 1.85;
+      color: #7a5a7a;
+      font-weight: 600;
+    }
+    .love-text .highlight {
+      color: var(--pink);
+      font-weight: 800;
+    }
+
+    /* dopamine activities */
+    .dopamine-card { border-color: rgba(168,230,207,0.4); }
+    .dopamine-card .card-title { color: #6dbaac; }
+
+    .activity-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+    }
+    .activity-item {
+      background: linear-gradient(135deg, var(--mint), var(--sky));
+      border-radius: 18px;
+      padding: 18px 14px;
+      text-align: center;
+      font-weight: 700;
+      color: #3a7a6e;
+      font-size: 0.95rem;
+      transition: transform 0.2s;
+    }
+    .activity-item:hover { transform: scale(1.04); }
+    .activity-item .act-icon { font-size: 2rem; display: block; margin-bottom: 8px; }
+
+    /* affirmation card */
+    .affirm-card { background: linear-gradient(135deg, #fff8e8, #fff0f6); border-color: rgba(255,224,102,0.4); }
+    .affirm-card .card-title { color: #e0a020; }
+    .affirm-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .affirm-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 1.05rem;
+      color: #7a6030;
+      font-weight: 600;
+      line-height: 1.5;
+    }
+    .affirm-list li .star { font-size: 1.3rem; flex-shrink: 0; }
+
+    /* big quote */
+    .quote-card {
+      background: linear-gradient(135deg, var(--lilac), var(--pink));
+      color: white;
+      text-align: center;
+      border: none;
+    }
+    .quote-text {
+      font-family: 'Pacifico', cursive;
+      font-size: clamp(1.1rem, 3.5vw, 1.6rem);
+      line-height: 1.6;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .quote-author {
+      margin-top: 14px;
+      font-size: 0.95rem;
+      opacity: 0.85;
+      font-weight: 600;
+    }
+
+    /* music section */
+    .music-card .card-title { color: var(--lilac); }
+    .music-tip {
+      background: linear-gradient(135deg, #f3eaff, #ffeaf5);
+      border-radius: 16px;
+      padding: 18px 22px;
+      font-size: 1rem;
+      color: #7a5aa0;
+      font-weight: 600;
+      line-height: 1.7;
+    }
+    .music-tip .wave { font-size: 1.4rem; }
+
+    /* secret message */
+    .secret-card {
+      background: linear-gradient(135deg, #ffeaf5, #eaf8ff);
+      text-align: center;
+      border-color: rgba(167,215,249,0.5);
+    }
+    .secret-card .card-title { color: var(--sky); }
+
+    .secret-btn {
+      display: inline-block;
+      margin-top: 14px;
+      background: linear-gradient(135deg, var(--pink), var(--lilac));
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 16px 38px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(255,133,161,0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .secret-btn:hover {
+      transform: scale(1.06);
+      box-shadow: 0 14px 36px rgba(201,167,245,0.5);
+    }
+
+    .secret-message {
+      display: none;
+      margin-top: 22px;
+      font-size: 1.1rem;
+      color: #7a5a7a;
+      font-weight: 700;
+      line-height: 1.8;
+      animation: fadeInUp 0.5s ease;
+    }
+    .secret-message.show { display: block; }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* confetti canvas */
+    #confetti-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    /* footer */
+    .footer {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 20px;
+      font-size: 1rem;
+      color: #c084a0;
+      font-weight: 700;
+    }
+    .footer span { animation: gentlePulse 2s ease-in-out infinite; display: inline-block; }
+
+    /* responsive */
+    @media (max-width: 520px) {
+      .card { padding: 26px 22px; }
+      .kitty-sticker { width: 80px; height: 80px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOADING SCREEN -->
+<div id="loader">
+  <div class="loader-floats" id="loaderFloats"></div>
+  <div class="loader-heart">🩷</div>
+  <div class="loader-title">Preparing something special for Retouja...</div>
+  <div class="loader-bar-wrap">
+    <div class="loader-bar"></div>
+  </div>
+  <div class="loader-sub">sprinkling love and happiness ✨</div>
+</div>
+
+<!-- floating hearts background -->
+<div class="hearts-bg" id="heartsBg"></div>
+
+<!-- confetti canvas -->
+<canvas id="confetti-canvas"></canvas>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="name-tag">Hey Retouja 🌸</div>
+  <p class="hero-subtitle">This page was made just for you because you deserve all the happiness in the world 💕</p>
+</div>
+
+<!-- Hello Kitty stickers from Google -->
+<div class="kitty-row">
+  <img class="kitty-sticker"
+    src="https://upload.wikimedia.org/wikipedia/en/thumb/0/05/Hello_kitty_character_portrait.png/220px-Hello_kitty_character_portrait.png"
+    alt="Hello Kitty" />
+  <img class="kitty-sticker"
+    src="https://pngimg.com/uploads/hello_kitty/hello_kitty_PNG34.png"
+    alt="Hello Kitty with bow"
+    onerror="this.src='https://upload.wikimedia.org/wikipedia/en/thumb/0/05/Hello_kitty_character_portrait.png/220px-Hello_kitty_character_portrait.png'" />
+  <img class="kitty-sticker"
+    src="https://pngimg.com/uploads/hello_kitty/hello_kitty_PNG36.png"
+    alt="Hello Kitty cute"
+    onerror="this.src='https://upload.wikimedia.org/wikipedia/en/thumb/0/05/Hello_kitty_character_portrait.png/220px-Hello_kitty_character_portrait.png'" />
+  <img class="kitty-sticker"
+    src="https://pngimg.com/uploads/hello_kitty/hello_kitty_PNG3.png"
+    alt="Hello Kitty star"
+    onerror="this.src='https://upload.wikimedia.org/wikipedia/en/thumb/0/05/Hello_kitty_character_portrait.png/220px-Hello_kitty_character_portrait.png'" />
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- Love message -->
+  <div class="card love-card">
+    <div class="card-title">🩷 A little note from me</div>
+    <p class="love-text">
+      Hey <span class="highlight">Retouja</span>, I know today was not easy and your heart feels heavy right now.
+      Family moments can be really really hard sometimes and it is okay to feel all of what you are feeling.
+      But I need you to know something very important: you are not alone in this.
+      Not even for one second. I am right here and I think you are the most beautiful and strong person I know.
+      This page is my way of sending you the biggest hug and reminding you that after every storm
+      there is always the most gorgeous sunshine waiting just for you 🌈✨
+    </p>
+  </div>
+
+  <!-- Big quote -->
+  <div class="card quote-card">
+    <p class="quote-text">
+      "You are a whole universe inside one person. One hard day does not change that."
+    </p>
+    <p class="quote-author">written just for Ritej 💫</p>
+  </div>
+
+  <!-- Science happiness boosters -->
+  <div class="card dopamine-card">
+    <div class="card-title">🧠 Science says these make you happy for real</div>
+    <p style="color:#5a9a8a; margin-bottom:18px; font-weight:600;">
+      Scientists found that your brain releases dopamine and all the good chemicals when you do these things.
+      So here is your little happiness menu today:
+    </p>
+    <div class="activity-grid">
+      <div class="activity-item">
+        <span class="act-icon">🎵</span>
+        Listen to your favorite song on repeat. Music gives your brain huge dopamine rushes.
+      </div>
+      <div class="activity-item" style="background: linear-gradient(135deg, #FFD6E8, #FFBCD9);">
+        <span class="act-icon">🍫</span>
+        Eat something yummy you love. Delicious food triggers real joy in your brain.
+      </div>
+      <div class="activity-item" style="background: linear-gradient(135deg, #D4EDFF, #B8E0FF);">
+        <span class="act-icon">😂</span>
+        Watch something that makes you laugh. Laughter boosts dopamine and endorphins together.
+      </div>
+      <div class="activity-item" style="background: linear-gradient(135deg, #FFE8B6, #FFD89B);">
+        <span class="act-icon">🌅</span>
+        Step outside for 5 minutes. Sunlight increases serotonin which lifts your whole mood.
+      </div>
+      <div class="activity-item" style="background: linear-gradient(135deg, #E8D4FF, #D4B8FF);">
+        <span class="act-icon">🛁</span>
+        A warm shower or bath. Heat relaxes your muscles and calms your whole nervous system.
+      </div>
+      <div class="activity-item" style="background: linear-gradient(135deg, #C8F7C5, #A8EDA5);">
+        <span class="act-icon">🌸</span>
+        Look at something beautiful. Beauty actually activates the reward center of your brain.
+      </div>
+    </div>
+  </div>
+
+  <!-- Music tip -->
+  <div class="card music-card">
+    <div class="card-title">🎶 A music tip from science just for you</div>
+    <div class="music-tip">
+      <span class="wave">🎧</span> Studies from McGill University showed that listening to music you love
+      releases just as much dopamine as eating your favorite food or receiving a gift.
+      The key is music with a fast happy beat and major key. So put on something that makes you want to dance
+      even a little bit and let your brain do the rest. You deserve to feel that wave of happiness right now 💜
+    </div>
+  </div>
+
+  <!-- Affirmations -->
+  <div class="card affirm-card">
+    <div class="card-title">✨ Things that are 100% true about you</div>
+    <ul class="affirm-list">
+      <li><span class="star">🌟</span> You are stronger than you think you are. Every single time.</li>
+      <li><span class="star">💖</span> The people who love you see how amazing you are even on your hardest days.</li>
+      <li><span class="star">🦋</span> This difficult moment will pass. You have survived every hard day before this one.</li>
+      <li><span class="star">🌸</span> Your feelings are valid and it is okay to take time to feel them all.</li>
+      <li><span class="star">✨</span> You bring so much light to the people around you without even realizing it.</li>
+      <li><span class="star">🩷</span> You deserve peace, love, warmth and all the good things life has to give.</li>
+    </ul>
+  </div>
+
+  <!-- Secret message -->
+  <div class="card secret-card">
+    <div class="card-title">💌 There is a secret message for you</div>
+    <p style="color:#5aabcc; font-weight:600;">Click the button to reveal something special Retouja</p>
+    <button class="secret-btn" onclick="revealSecret()">Open your message 🌸</button>
+    <div class="secret-message" id="secretMsg">
+      Ritej. I chose you every day. Not just when things are easy but especially when they are hard.
+      You mean more to me than any words I could write on any website. You are my favorite human.
+      When you are hurting I am hurting with you and when you smile I feel like the whole world is smiling.
+      So please let yourself be taken care of today. Eat something good. Play your music. Rest.
+      And know that I love you more than you know. Always 🌹💕
+    </div>
+  </div>
+
+</div>
+
+<!-- footer -->
+<div class="footer">
+  Made with so much love just for <span>Retouja 💕</span>
+</div>
+
+<script>
+  // ===== LOADING SCREEN =====
+  (function() {
+    const loader = document.getElementById('loader');
+    const floatsWrap = document.getElementById('loaderFloats');
+    const emojis = ['🌸','💕','✨','🌷','💖','🦋','⭐','🩷','🌈','💜'];
+
+    // scatter floating emojis inside loader
+    emojis.forEach((em, i) => {
+      const el = document.createElement('span');
+      el.className = 'lf';
+      el.textContent = em;
+      el.style.left  = (8 + Math.random() * 84) + '%';
+      el.style.top   = (10 + Math.random() * 75) + '%';
+      el.style.animationDelay    = (i * 0.28) + 's';
+      el.style.animationDuration = (2.4 + Math.random() * 1.2) + 's';
+      floatsWrap.appendChild(el);
+    });
+
+    // dismiss after 3 seconds
+    setTimeout(() => {
+      loader.classList.add('hide');
+      setTimeout(() => loader.style.display = 'none', 850);
+    }, 3000);
+  })();
+  // ===== END LOADING SCREEN =====
+
+  // floating hearts background
+  (function() {
+    const bg = document.getElementById('heartsBg');
+    const symbols = ['💕','🌸','✨','🩷','💜','🌷','💖','⭐'];
+    for (let i = 0; i < 28; i++) {
+      const el = document.createElement('span');
+      el.className = 'heart-float';
+      el.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+      el.style.left = Math.random() * 100 + 'vw';
+      el.style.animationDuration = (8 + Math.random() * 14) + 's';
+      el.style.animationDelay = (Math.random() * 12) + 's';
+      el.style.fontSize = (1 + Math.random() * 1.5) + 'rem';
+      bg.appendChild(el);
+    }
+  })();
+
+  // reveal secret + confetti
+  function revealSecret() {
+    const msg = document.getElementById('secretMsg');
+    msg.classList.add('show');
+    document.querySelector('.secret-btn').style.display = 'none';
+    launchConfetti();
+  }
+
+  // confetti
+  function launchConfetti() {
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const colors = ['#FF85A1','#C9A7F5','#FFB5A7','#A8E6CF','#A7D7F9','#FFE066','#FFD6E8'];
+    const pieces = [];
+    for (let i = 0; i < 180; i++) {
+      pieces.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        r: 4 + Math.random() * 8,
+        d: 1 + Math.random() * 3,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        tilt: Math.random() * 10 - 10,
+        tiltAngle: 0,
+        tiltSpeed: 0.05 + Math.random() * 0.1
+      });
+    }
+
+    let frame = 0;
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      pieces.forEach(p => {
+        ctx.beginPath();
+        ctx.lineWidth = p.r / 2;
+        ctx.strokeStyle = p.color;
+        ctx.moveTo(p.x + p.tilt + p.r / 3, p.y);
+        ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r);
+        ctx.stroke();
+        p.y += p.d;
+        p.tiltAngle += p.tiltSpeed;
+        p.tilt = Math.sin(p.tiltAngle) * 12;
+      });
+      frame++;
+      if (frame < 180) requestAnimationFrame(draw);
+      else ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    draw();
+  }
+</script>
+</body>
+</html>
